@@ -11,6 +11,7 @@ WINDOW_TITLE = "Boids Simulation"
 FPS = 60
 NUM_BOIDS = 20
 BOID_COLOR = (245, 95, 95)
+BOID_SPEED = 200
 
 # Setup
 pyglet.options["dpi_scaling"] = "real"
@@ -30,7 +31,6 @@ debug_label = pyglet.text.Label(
     batch=batch
 )
 
-BOID_SPEED = 100
 
 class Boid:
     def __init__(self, x, y, vx, vy):
@@ -45,6 +45,12 @@ class Boid:
         self.vy = vy
 
     def update(self, dt):
+        distance = math.sqrt(self.vx**2 + self.vy**2)
+        target_vx = (self.vx / distance) * BOID_SPEED
+        target_vy = (self.vy / distance) * BOID_SPEED
+        self.vx += 0.02 * (target_vx - self.vx)
+        self.vy += 0.02 * (target_vy - self.vy)
+
         self.shape.x += self.vx * dt
         self.shape.y += self.vy * dt
 
@@ -62,14 +68,12 @@ class Boid:
 
 class Simulation:
     def __init__(self):
-        shapes.Triangle._anchor_x = 15
-        shapes.Triangle._anchor_y = 15
+        shapes.Triangle._anchor_y = -15
         self.boids = []
         for _ in range(NUM_BOIDS):
             x = random.randint(0, WINDOW_WIDTH)
             y = random.randint(0, WINDOW_HEIGHT)
-            angle = random.uniform(0, 2 * math.pi)
-            self.boids.append(Boid(x, y, BOID_SPEED * math.cos(angle), BOID_SPEED * math.sin(angle)))
+            self.boids.append(Boid(x, y, random.uniform(-1, 1), random.uniform(-1, 1)))
 
     def update(self, dt):
         debug_label.text = f"FPS: {1/dt:.0f}"
