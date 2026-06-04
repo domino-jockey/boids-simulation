@@ -1,11 +1,12 @@
 import random
+import math
 import pyglet
 from pyglet import shapes
 from pyglet.window import key
 
 # Constants
-WINDOW_WIDTH = 1200
-WINDOW_HEIGHT = 900
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
 WINDOW_TITLE = "Boids Simulation"
 FPS = 60
 NUM_BOIDS = 20
@@ -29,6 +30,36 @@ debug_label = pyglet.text.Label(
     batch=batch
 )
 
+BOID_SPEED = 100
+
+class Boid:
+    def __init__(self, x, y, vx, vy):
+        self.shape = shapes.Triangle(
+            x, y + 15,
+            x - 15, y - 15,
+            x + 15, y - 15,
+            color=BOID_COLOR,
+            batch=batch
+        )
+        self.vx = vx
+        self.vy = vy
+
+    def update(self, dt):
+        self.shape.x += self.vx * dt
+        self.shape.y += self.vy * dt
+
+        if self.shape.x > WINDOW_WIDTH:
+            self.shape.x = 0
+        elif self.shape.x < 0:
+            self.shape.x = WINDOW_WIDTH
+
+        if self.shape.y > WINDOW_HEIGHT:
+            self.shape.y = 0
+        elif self.shape.y < 0:
+            self.shape.y = WINDOW_HEIGHT
+
+        self.shape.rotation = -math.degrees(math.atan2(self.vy, self.vx)) + 90
+
 class Simulation:
     def __init__(self):
         shapes.Triangle._anchor_x = 15
@@ -37,17 +68,13 @@ class Simulation:
         for _ in range(NUM_BOIDS):
             x = random.randint(0, WINDOW_WIDTH)
             y = random.randint(0, WINDOW_HEIGHT)
-            t = shapes.Triangle(
-                x, y + 15,
-                x - 15, y - 15,
-                x + 15, y - 15,
-                color=BOID_COLOR,
-                batch=batch
-            )
-            self.boids.append(t)
+            angle = random.uniform(0, 2 * math.pi)
+            self.boids.append(Boid(x, y, BOID_SPEED * math.cos(angle), BOID_SPEED * math.sin(angle)))
 
     def update(self, dt):
         debug_label.text = f"FPS: {1/dt:.0f}"
+        for boid in self.boids:
+            boid.update(dt)
 
     def draw(self):
         window.clear()
