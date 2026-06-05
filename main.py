@@ -1,9 +1,14 @@
 import random
 import pyglet
-from pyglet import shapes
 from pyglet.window import key
 from boid import Boid
-from constants import BOID_SIZE, NUM_BOIDS, WINDOW_HEIGHT, WINDOW_TITLE, WINDOW_WIDTH, FPS
+from constants import (
+    WINDOW_WIDTH,
+    WINDOW_HEIGHT,
+    WINDOW_TITLE,
+    NUM_BOIDS,
+    FPS
+)
 
 # Setup
 pyglet.options["dpi_scaling"] = "real"
@@ -27,7 +32,6 @@ debug_label = pyglet.text.Label(
 
 class Simulation:
     def __init__(self):
-        shapes.Triangle._anchor_y = -BOID_SIZE
         self.boids = []
         for _ in range(NUM_BOIDS):
             x = random.randint(0, WINDOW_WIDTH)
@@ -37,7 +41,7 @@ class Simulation:
     def update(self, dt):
         debug_label.text = f"FPS: {1/dt:.0f}"
         for boid in self.boids:
-            boid.update(dt)
+            boid.update(dt, self.boids)
 
     def draw(self):
         window.clear()

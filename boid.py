@@ -1,6 +1,17 @@
 import math
+import random
 from pyglet import shapes
-from constants import BOID_SIZE, BOID_COLOR, BOID_SPEED, WINDOW_HEIGHT, WINDOW_WIDTH
+from constants import (
+    WINDOW_WIDTH,
+    WINDOW_HEIGHT,
+    BOID_SPEED,
+    BOID_SIZE,
+    BOID_COLOR,
+    SEPARATION,
+    RANGE,
+)
+
+shapes.Triangle._anchor_y = -BOID_SIZE
 
 class Boid:
     def __init__(self, x, y, vx, vy, batch):
@@ -26,21 +37,39 @@ class Boid:
             self.shape.y = WINDOW_HEIGHT + gap
 
     def steer(self, target_vx, target_vy, factor):
-        self.vx += factor * (target_vx - self.vx)
-        self.vy += factor * (target_vy - self.vy)
-        
-    def update(self, dt):
-        distance = math.sqrt(self.vx**2 + self.vy**2)
-        if distance == 0:
-            distance = 0.01
-        target_vx = (self.vx / distance) * BOID_SPEED
-        target_vy = (self.vy / distance) * BOID_SPEED
+        self.vx += factor * (target_vx)
+        self.vy += factor * (target_vy)
+    
+    def separation(self, other, dst):
+        push_vx = self.shape.x - other.shape.x
+        push_vy = self.shape.y - other.shape.y
+        push_vx /= dst**1.4
+        push_vy /= dst**1.4
+        self.steer(push_vx, push_vy, SEPARATION)
+ 
+    def update(self, dt, boids):
+        velocity = math.sqrt(self.vx**2 + self.vy**2)
+        if velocity == 0:
+            target_vx = random.uniform(0.1, BOID_SPEED)
+            target_vy = random.uniform(0.1, BOID_SPEED)
+        else:
+            target_vx = (self.vx / velocity) * BOID_SPEED
+            target_vy = (self.vy / velocity) * BOID_SPEED
 
-        self.steer(target_vx, target_vy, 0.02)
-
+        self.vx += 0.2 * (target_vx - self.vx)
+        self.vy += 0.2 * (target_vy - self.vy)
+ 
+        for other in boids:
+            if other is self:
+                continue
+            dst = math.sqrt((self.shape.x - other.shape.x)**2 + (self.shape.y - other.shape.y)**2)
+            if dst < RANGE and dst > 0:
+                self.separation(other, dst)
+ 
         self.shape.x += self.vx * dt
         self.shape.y += self.vy * dt
-
+ 
         self.wrap_around(BOID_SIZE)
 
         self.shape.rotation = -math.degrees(math.atan2(self.vy, self.vx)) + 90
+
