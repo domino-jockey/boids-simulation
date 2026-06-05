@@ -2,12 +2,14 @@ import math
 import random
 from pyglet import shapes
 from constants import (
+    ALIGNMENT,
     WINDOW_WIDTH,
     WINDOW_HEIGHT,
     BOID_SPEED,
     BOID_SIZE,
     BOID_COLOR,
     SEPARATION,
+    COHESION,
     RANGE,
 )
 
@@ -40,13 +42,6 @@ class Boid:
         self.vx += factor * (target_vx)
         self.vy += factor * (target_vy)
     
-    def separation(self, other, dst):
-        push_vx = self.shape.x - other.shape.x
-        push_vy = self.shape.y - other.shape.y
-        push_vx /= dst**1.4
-        push_vy /= dst**1.4
-        self.steer(push_vx, push_vy, SEPARATION)
- 
     def update(self, dt, boids):
         velocity = math.sqrt(self.vx**2 + self.vy**2)
         if velocity == 0:
@@ -59,13 +54,30 @@ class Boid:
         self.vx += 0.2 * (target_vx - self.vx)
         self.vy += 0.2 * (target_vy - self.vy)
  
+        ct = 0
+        sum_x = 0
+        sum_y = 0
+        sum_vx = 0
+        sum_vy = 0
         for other in boids:
             if other is self:
                 continue
-            dst = math.sqrt((self.shape.x - other.shape.x)**2 + (self.shape.y - other.shape.y)**2)
+            dst_x = other.shape.x - self.shape.x
+            dst_y = other.shape.y - self.shape.y
+            dst = math.sqrt((dst_x)**2 + (dst_y)**2)
             if dst < RANGE and dst > 0:
-                self.separation(other, dst)
- 
+                push_vx = -dst_x / dst**1.4
+                push_vy = -dst_y / dst**1.4
+                self.steer(push_vx, push_vy, SEPARATION)
+                sum_x += dst_x 
+                sum_y += dst_y 
+                sum_vx += other.vx - self.vx
+                sum_vy += other.vy - self.vy
+                ct += 1
+        if ct > 0:
+            self.steer(sum_x/ct, sum_y/ct, COHESION)
+            self.steer(sum_vx/ct, sum_vy/ct, ALIGNMENT)
+
         self.shape.x += self.vx * dt
         self.shape.y += self.vy * dt
  
