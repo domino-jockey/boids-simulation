@@ -7,7 +7,6 @@ from constants import (
     WINDOW_HEIGHT,
     BOID_SPEED,
     BOID_SIZE,
-    BOID_COLOR,
     SEPARATION,
     COHESION,
     RANGE,
@@ -16,33 +15,37 @@ from constants import (
 shapes.Triangle._anchor_y = -BOID_SIZE
 
 class Boid:
-    def __init__(self, x, y, vx, vy, batch):
+    def __init__(self, x, y, vx, vy, color, batch):
         self.shape = shapes.Triangle(
             x, y + BOID_SIZE,
             x - BOID_SIZE, y - BOID_SIZE,
             x + BOID_SIZE, y - BOID_SIZE,
-            color=BOID_COLOR,
+            color=color,
             batch=batch
         )
         self.vx = vx
         self.vy = vy
 
-    def wrap_around(self, gap):
+    def wrap_around(self, gap, hue):
         if self.shape.x > WINDOW_WIDTH + gap:
             self.shape.x = 0 - gap
+            self.shape.color = (255, 0, hue)
         elif self.shape.x < 0 - gap:
             self.shape.x = WINDOW_WIDTH + gap
+            self.shape.color = (255, 0, hue)
 
         if self.shape.y > WINDOW_HEIGHT + gap:
             self.shape.y = 0 - gap
+            self.shape.color = (255, 0, hue)
         elif self.shape.y < 0 - gap:
             self.shape.y = WINDOW_HEIGHT + gap
+            self.shape.color = (255, 0, hue)
 
     def steer(self, target_vx, target_vy, factor):
         self.vx += factor * (target_vx)
         self.vy += factor * (target_vy)
     
-    def update(self, dt, boids):
+    def update(self, dt, boids, hue):
         velocity = math.sqrt(self.vx**2 + self.vy**2)
         if velocity == 0:
             target_vx = random.uniform(0.1, BOID_SPEED)
@@ -81,7 +84,7 @@ class Boid:
         self.shape.x += self.vx * dt
         self.shape.y += self.vy * dt
  
-        self.wrap_around(BOID_SIZE)
+        self.wrap_around(BOID_SIZE, hue)
 
         self.shape.rotation = -math.degrees(math.atan2(self.vy, self.vx)) + 90
 

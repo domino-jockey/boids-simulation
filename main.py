@@ -22,14 +22,27 @@ batch = pyglet.graphics.Batch()
 class Simulation:
     def __init__(self):
         self.boids = []
+        self.hue = 0
+        self.hue_ct = 0
         for _ in range(NUM_BOIDS):
             x = random.randint(0, WINDOW_WIDTH)
             y = random.randint(0, WINDOW_HEIGHT)
-            self.boids.append(Boid(x, y, random.uniform(-1, 1), random.uniform(-1, 1), batch))
+            self.change_hue()
+            color = int(y / WINDOW_HEIGHT * 255)
+            self.boids.append(Boid(x, y, random.uniform(-1, 1), random.uniform(-1, 1), (255, 0, color), batch))
+
+    def change_hue(self):
+        self.hue_ct += 1
+        self.hue_ct %= 511
+        if self.hue_ct < 256:
+            self.hue = self.hue_ct
+        else:
+            self.hue = 510 - self.hue_ct
 
     def update(self, dt):
+        self.change_hue()
         for boid in self.boids:
-            boid.update(dt, self.boids)
+            boid.update(dt, self.boids, self.hue)
 
     def draw(self):
         pyglet.shapes.Rectangle(0, 0, window.width, window.height, color=(0, 0, 0, 60)).draw()
