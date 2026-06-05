@@ -19,17 +19,6 @@ window.push_handlers(keys)
 
 batch = pyglet.graphics.Batch()
 
-debug_label = pyglet.text.Label(
-    text="FPS: 0",
-    font_name='Arial',
-    font_size=32,
-    x=WINDOW_WIDTH // 2,
-    y=WINDOW_HEIGHT - 50,
-    anchor_x='center',
-    anchor_y='center',
-    batch=batch
-)
-
 class Simulation:
     def __init__(self):
         self.boids = []
@@ -39,12 +28,11 @@ class Simulation:
             self.boids.append(Boid(x, y, random.uniform(-1, 1), random.uniform(-1, 1), batch))
 
     def update(self, dt):
-        debug_label.text = f"FPS: {1/dt:.0f}"
         for boid in self.boids:
             boid.update(dt, self.boids)
 
     def draw(self):
-        window.clear()
+        pyglet.shapes.Rectangle(0, 0, window.width, window.height, color=(0, 0, 0, 60)).draw()
         batch.draw()
 
 sim = Simulation()
