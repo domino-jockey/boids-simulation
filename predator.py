@@ -17,7 +17,7 @@ class Predator:
             x, y + PREDATOR_SIZE,
             x - PREDATOR_SIZE, y - PREDATOR_SIZE,
             x + PREDATOR_SIZE, y - PREDATOR_SIZE,
-            color=(255, 255, 255),
+            color=(255, 230, 225),
             batch=batch
         )
         self.vx = PREDATOR_SPEED
