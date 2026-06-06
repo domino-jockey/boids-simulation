@@ -54,9 +54,7 @@ class Boid:
             target_vx = (self.vx / velocity) * BOID_SPEED
             target_vy = (self.vy / velocity) * BOID_SPEED
 
-        self.vx += 0.2 * (target_vx - self.vx)
-        self.vy += 0.2 * (target_vy - self.vy)
-
+        self.steer(target_vx - self.vx, target_vy - self.vy, 0.2)
 
     def calculate_vel(self, boids, predators):
         ct = 0

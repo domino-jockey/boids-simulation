@@ -21,6 +21,9 @@ window.push_handlers(keys)
 
 batch = pyglet.graphics.Batch()
 
+mouse_x = 0
+mouse_y = 0
+
 class Simulation:
     def __init__(self):
         self.boids = []
@@ -32,10 +35,10 @@ class Simulation:
             y = random.randint(0, WINDOW_HEIGHT)
             color = int(y / WINDOW_HEIGHT * 255)
             self.boids.append(Boid(x, y, random.uniform(-1, 1), random.uniform(-1, 1), (255, 0, color), batch))
-        for _ in range(NUM_PREDATORS):
+        for i in range(NUM_PREDATORS):
             x = random.randint(0, WINDOW_WIDTH)
             y = random.randint(0, WINDOW_HEIGHT)
-            self.predators.append(Predator(x, y, batch))
+            self.predators.append(Predator(x, y, i, batch))
 
     def change_hue(self):
         self.hue_ct += 1
@@ -50,13 +53,19 @@ class Simulation:
         for boid in self.boids:
             boid.update(dt, self.boids, self.predators, self.hue)
         for predator in self.predators:
-            predator.update(dt, self.boids)
+            predator.update(dt, self.boids, mouse_x, mouse_y)
 
     def draw(self):
         pyglet.shapes.Rectangle(0, 0, window.width, window.height, color=(0, 0, 0, 60)).draw()
         batch.draw()
 
 sim = Simulation()
+
+@window.event
+def on_mouse_motion(x, y, dx, dy):
+    global mouse_x, mouse_y
+    mouse_x = x
+    mouse_y = y
 
 @window.event
 def on_draw():

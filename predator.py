@@ -12,7 +12,7 @@ from constants import (
 shapes.Triangle._anchor_y = -PREDATOR_SIZE
 
 class Predator:
-    def __init__(self, x, y, batch):
+    def __init__(self, x, y, i, batch):
         self.shape = shapes.Triangle(
             x, y + PREDATOR_SIZE,
             x - PREDATOR_SIZE, y - PREDATOR_SIZE,
@@ -22,6 +22,7 @@ class Predator:
         )
         self.vx = PREDATOR_SPEED
         self.vy = PREDATOR_SPEED
+        self.id = i
 
     def wrap_around(self, gap):
         if self.shape.x > WINDOW_WIDTH + gap:
@@ -47,9 +48,7 @@ class Predator:
             target_vx = (self.vx / velocity) * PREDATOR_SPEED
             target_vy = (self.vy / velocity) * PREDATOR_SPEED
 
-        self.vx += 0.2 * (target_vx - self.vx)
-        self.vy += 0.2 * (target_vy - self.vy)
-
+        self.steer(target_vx - self.vx, target_vy - self.vy, 0.2)
 
     def calculate_vel(self, boids):
         nearest_dst = PREDATOR_RANGE
@@ -65,13 +64,16 @@ class Predator:
                     nearest_y = dst_y
                     nearest_dst = dst
         if nearest_dst < PREDATOR_RANGE:
-            pull_vx = nearest_x
-            pull_vy = nearest_y
-            self.steer(pull_vx, pull_vy, PREDATOR_PULL)
+            pull_x = nearest_x
+            pull_y = nearest_y
+            self.steer(pull_x, pull_y, PREDATOR_PULL)
 
-    def update(self, dt, boids):
+    def update(self, dt, boids, mouse_x, mouse_y):
         self.stabalize_vel()
-        self.calculate_vel(boids)
+        if self.id == 0:
+            self.steer(mouse_x - self.shape.x, mouse_y - self.shape.y, 0.05)
+        else:
+            self.calculate_vel(boids)
  
         self.shape.x += self.vx * dt
         self.shape.y += self.vy * dt
