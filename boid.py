@@ -44,8 +44,8 @@ class Boid:
     def steer(self, target_vx, target_vy, factor):
         self.vx += factor * (target_vx)
         self.vy += factor * (target_vy)
-    
-    def update(self, dt, boids, hue):
+
+    def stabalize_vel(self):
         velocity = math.sqrt(self.vx**2 + self.vy**2)
         if velocity == 0:
             target_vx = random.uniform(0.1, BOID_SPEED)
@@ -56,7 +56,9 @@ class Boid:
 
         self.vx += 0.2 * (target_vx - self.vx)
         self.vy += 0.2 * (target_vy - self.vy)
- 
+
+
+    def calculate_vel(self, boids):
         ct = 0
         sum_x = 0
         sum_y = 0
@@ -81,10 +83,12 @@ class Boid:
             self.steer(sum_x/ct, sum_y/ct, COHESION)
             self.steer(sum_vx/ct, sum_vy/ct, ALIGNMENT)
 
+    def update(self, dt, boids, hue):
+        self.stabalize_vel()
+        self.calculate_vel(boids)
+ 
         self.shape.x += self.vx * dt
         self.shape.y += self.vy * dt
- 
         self.wrap_around(BOID_SIZE, hue)
-
         self.shape.rotation = -math.degrees(math.atan2(self.vy, self.vx)) + 90
 
