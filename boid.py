@@ -83,14 +83,14 @@ class Boid:
             self.steer(sum_x/ct, sum_y/ct, COHESION)
             self.steer(sum_vx/ct, sum_vy/ct, ALIGNMENT)
 
-        # for predator in predators:
-        #     dst_x = predator.shape.x - self.shape.x
-        #     dst_y = predator.shape.y - self.shape.y
-        #     dst = math.sqrt((dst_x)**2 + (dst_y)**2)
-        #     if dst < RANGE and dst > 0:
-        #         push_vx = -dst_x / dst**1.4
-        #         push_vy = -dst_y / dst**1.4
-        #         self.steer(push_vx, push_vy, SEPARATION)
+        for predator in predators:
+            dst_x = predator.shape.x - self.shape.x
+            dst_y = predator.shape.y - self.shape.y
+            dst = math.sqrt((dst_x)**2 + (dst_y)**2)
+            if dst < RANGE and dst > 0:
+                push_vx = -dst_x / dst**1.4
+                push_vy = -dst_y / dst**1.4
+                self.steer(push_vx, push_vy, SEPARATION * 8)
 
     def update(self, dt, boids, predators, hue):
         self.stabalize_vel()
