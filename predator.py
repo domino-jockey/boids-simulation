@@ -1,6 +1,7 @@
 import math
 from pyglet import shapes
 from constants import (
+    MOUSE_PREDATOR,
     WINDOW_WIDTH,
     WINDOW_HEIGHT,
     PREDATOR_RANGE,
@@ -70,7 +71,7 @@ class Predator:
 
     def update(self, dt, boids, mouse_x, mouse_y):
         self.stabalize_vel()
-        if self.id == 0:
+        if self.id == 0 and MOUSE_PREDATOR == True:
             self.steer(mouse_x - self.shape.x, mouse_y - self.shape.y, 0.05)
         else:
             self.calculate_vel(boids)

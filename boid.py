@@ -10,6 +10,7 @@ from constants import (
     SEPARATION,
     COHESION,
     RANGE,
+    PREDATOR_FEAR
 )
 
 shapes.Triangle._anchor_y = -BOID_SIZE
@@ -88,7 +89,7 @@ class Boid:
             if dst < RANGE and dst > 0:
                 push_vx = -dst_x / dst**1.4
                 push_vy = -dst_y / dst**1.4
-                self.steer(push_vx, push_vy, SEPARATION * 8)
+                self.steer(push_vx, push_vy, PREDATOR_FEAR)
 
     def update(self, dt, boids, predators, hue):
         self.stabalize_vel()
