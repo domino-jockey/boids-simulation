@@ -58,7 +58,7 @@ class Boid:
         self.vy += 0.2 * (target_vy - self.vy)
 
 
-    def calculate_vel(self, boids):
+    def calculate_vel(self, boids, predators):
         ct = 0
         sum_x = 0
         sum_y = 0
@@ -83,9 +83,18 @@ class Boid:
             self.steer(sum_x/ct, sum_y/ct, COHESION)
             self.steer(sum_vx/ct, sum_vy/ct, ALIGNMENT)
 
-    def update(self, dt, boids, hue):
+        # for predator in predators:
+        #     dst_x = predator.shape.x - self.shape.x
+        #     dst_y = predator.shape.y - self.shape.y
+        #     dst = math.sqrt((dst_x)**2 + (dst_y)**2)
+        #     if dst < RANGE and dst > 0:
+        #         push_vx = -dst_x / dst**1.4
+        #         push_vy = -dst_y / dst**1.4
+        #         self.steer(push_vx, push_vy, SEPARATION)
+
+    def update(self, dt, boids, predators, hue):
         self.stabalize_vel()
-        self.calculate_vel(boids)
+        self.calculate_vel(boids, predators)
  
         self.shape.x += self.vx * dt
         self.shape.y += self.vy * dt
